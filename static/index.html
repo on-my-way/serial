@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		
+		<script type="text/javascript" src="js/jquery-3.2.1.min.js" ></script>
+		
+		<style type="text/css">
+		</style>
+		
+		<script>
+			var t;
+			function get_data(){
+				$.get("/read_data", function(data, status) {
+					var old_var = $("#my_ta").val();
+					$("#my_ta").val(old_var + data);
+					//t = setTimeout("get_data()", 1000);
+				});
+			}
+			
+			function get_port_baudrates(port) {
+				$.get("/get_bauds?port=" + port, function(data,status) {
+					var obj = JSON.parse(data);
+					for (var i = 0; i < obj.bauds.length; i++) {
+						var option = "<option values=" + obj.bauds[i]+ ">" + obj.bauds[i] + "</option>";
+						$("#bauds").append(option);
+					}
+				});
+			}
+			
+			$(document).ready(function() {
+				get_data();
+			
+				$("#stop").click(function(){
+					clearTimeout(t);
+				});
+				
+				$("#start").click(function(){
+					t = setTimeout("get_data()", 1000);
+				});
+				
+				$("#clear").click(function(){
+					$("#my_ta").val("");
+				});
+				
+				$.get("/get_coms", function(data,status) {
+					var obj = JSON.parse(data);
+					for (var i = 0; i < obj.port.length; i++) {
+						$("#coms").append("<option value=" + obj.port[i] + ">" + obj.port[i] + "</option>");
+					}
+					get_port_baudrates(obj.port[0]);
+				});
+				
+
+				$("#coms").bind("change", function(){
+					alert($(this).val());
+					get_port_baudrates($(this).val());
+				});
+				
+				$("#bauds").bind("change", function() {
+					$.post("/set_baud", 
+						{
+							baud:$(this).val()
+						});
+				})
+			});
+		</script>
+		
+	
+	
+	</head>
+	
+	<body>
+		<!--<canvas id="myCanvas" width="200" height="100"></canvas>-->
+		<div>
+		<textarea id="my_ta" rows="50" cols="100">aaaaaaaa</textarea>
+		</div>
+		
+		<form>
+			<select id="coms"></select>
+			<select id="bauds"></select>
+		</form>
+		
+		<div>
+		<button id="stop">停止</button>
+		<button id="start">开始</button>
+		<button id="clear">清除</button>
+		</div>
+		
+		
+	
+	</body>
+</html>
