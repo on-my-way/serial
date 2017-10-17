@@ -12,7 +12,7 @@
 		<script>
 			var t;
 			function get_data(){
-				$.get("/read_data", function(data, status) {
+				$.get("/get_data", function(data, status) {
 					var old_var = $("#my_ta").val();
 					$("#my_ta").val(old_var + data);
 					//t = setTimeout("get_data()", 1000);
